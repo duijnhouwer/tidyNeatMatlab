@@ -26,9 +26,9 @@ rng(20160526);
     max_overall_fitness=[];
     
   %parameters initial population
-    population_size=150;
-    number_input_nodes=2;
-    number_output_nodes=1;
+    popSize=150;
+    nInput=2;
+    nOutput=1;
     vector_connected_input_nodes=[1 2]; %vector of initially connected input nodes out of complete number of input nodes 
                                           %(if you want to start with a subset and let evolution decide which ones are necessary)
                                           %for a fully connected initial population, uncomment the following:
@@ -58,7 +58,7 @@ rng(20160526);
     
     
     %initial setup
-    initial.kill_percentage=0.2; %the percentage of each species which will be eliminated (lowest performing individuals)
+    initial.killRate = 0.2; %the fraction of each species which will be eliminated (lowest performing individuals)
     initial.number_for_kill=5; % the above percentage for eliminating individuals will only be used in species which have more individuals than min_number_for_kill 
                                % Please note that whatever the above settings, the code always ensures that at least 2 individuals are kept to be able to cross over, or at least the single individual in a species with only one individual
     initial.number_copy=5; % species which have equal or greater than number_copy individuals will have their best individual copied unchanged into the next generation
@@ -88,11 +88,11 @@ rng(20160526);
 if load_flag==0
    
    %call function to create initial population
-   %for information about the make-up of the population structure and the innovation_record, look at initial_population.m
-   [population,innovation_record]=initial_population(population_size, number_input_nodes, number_output_nodes, vector_connected_input_nodes);
+   %for information about the make-up of the population structure and the innovation_record, look at initPop.m
+   [population,innovation_record]=initPop(popSize, nInput, nOutput, vector_connected_input_nodes);
 
    %initial speciation
-   number_connections=(length(vector_connected_input_nodes)+1)*number_output_nodes;
+   number_connections=(length(vector_connected_input_nodes)+1)*nOutput;
    %put first individual in species one and update species_record
    population(1).species=1;
    matrix_reference_individuals=population(1).connectiongenes(4,:); %species reference matrix (abbreviated, only weights, since there are no topology differences in initial population)
@@ -189,8 +189,8 @@ while generation<maxgeneration & flag_solution==0
       a=a+sum(population(index_individual).connectiongenes(5,:)==1);
       b=b+sum(population(index_individual).nodegenes(2,:)==3);
    end
-   average_number_non_disabled_connections=[average_number_non_disabled_connections,[a/population_size;generation]];
-   average_number_hidden_nodes=[average_number_hidden_nodes,[b/population_size;generation]];
+   average_number_non_disabled_connections=[average_number_non_disabled_connections,[a/popSize;generation]];
+   average_number_hidden_nodes=[average_number_hidden_nodes,[b/popSize;generation]];
    c=[];
    for index_species=1:size(species_record,2)
       c=[c,species_record(index_species).generation_record(1:3,size(species_record(index_species).generation_record,2))];
@@ -217,7 +217,7 @@ while generation<maxgeneration & flag_solution==0
    
    if flag_solution==0
    %call reproduction function with parameters, current population and species record, returns new population, new species record and new innovation record
-   [population,species_record,innovation_record]=reproduce(population, species_record, innovation_record, initial, selection, crossover, mutation, speciation, generation, population_size);
+   [population,species_record,innovation_record]=reproduce(population, species_record, innovation_record, initial, selection, crossover, mutation, speciation, generation,popSize);
    toc;
    end
    %increment generational counter
